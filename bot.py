@@ -5,11 +5,10 @@ from telegram.ext import Application, CommandHandler, CallbackQueryHandler, Mess
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-TOKEN = "YOUR_BOT_TOKEN_HERE"
-ADMIN_ID = None  # ضع ID الخاص بك هنا
+TOKEN = "8618381817:AAHvt4BAUONCzuFmSQiVjDvJHCg92RZW1cI"
+ADMIN_ID = None
 WHATSAPP = "0664530175"
 
-# ===== قائمة المنتجات =====
 PRODUCTS = [
     {"id": 1, "name": "عباية أنيقة فاخرة", "emoji": "🖤", "desc": "عباية أنيقة من قماش عالي الجودة", "price": 350},
     {"id": 2, "name": "عباية كيمونو", "emoji": "🦋", "desc": "عباية كيمونو بتطريز رائع", "price": 420},
@@ -18,7 +17,6 @@ PRODUCTS = [
     {"id": 5, "name": "عباية رياضية", "emoji": "🏃‍♀️", "desc": "مريحة وعملية للحياة النشيطة", "price": 320},
 ]
 
-# ===== السلة =====
 carts = {}
 orders = {}
 order_counter = [1]
@@ -32,7 +30,6 @@ def get_cart_total(user_id):
     cart = get_cart(user_id)
     return sum(item["price"] * item["qty"] for item in cart)
 
-# ===== القائمة الرئيسية =====
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await show_main_menu(update, context)
 
@@ -54,7 +51,6 @@ async def show_main_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         await update.message.reply_text(text, reply_markup=markup, parse_mode="Markdown")
 
-# ===== المنتجات =====
 async def show_products(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
@@ -113,7 +109,6 @@ async def add_to_cart(update: Update, context: ContextTypes.DEFAULT_TYPE, produc
         parse_mode="Markdown"
     )
 
-# ===== السلة =====
 async def show_cart(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
@@ -145,7 +140,6 @@ async def clear_cart(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 [InlineKeyboardButton("🏠 القائمة الرئيسية", callback_data="main_menu")]]
     await query.edit_message_text("🗑️ تم إفراغ السلة", reply_markup=InlineKeyboardMarkup(keyboard))
 
-# ===== تأكيد الطلب =====
 async def confirm_order(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
@@ -197,7 +191,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             parse_mode="Markdown"
         )
 
-# ===== طلباتي =====
 async def show_my_orders(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
@@ -214,7 +207,6 @@ async def show_my_orders(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [[InlineKeyboardButton("🔙 رجوع", callback_data="main_menu")]]
     await query.edit_message_text(text, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="Markdown")
 
-# ===== التواصل =====
 async def show_contact(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
@@ -231,11 +223,9 @@ async def show_contact(update: Update, context: ContextTypes.DEFAULT_TYPE):
         parse_mode="Markdown"
     )
 
-# ===== المعالج الرئيسي =====
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     data = query.data
-
     if data == "main_menu":
         await show_main_menu(update, context)
     elif data == "products":
@@ -248,3 +238,22 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await add_to_cart(update, context, pid)
     elif data == "cart":
         await show_cart(update, context)
+    elif data == "clear_cart":
+        await clear_cart(update, context)
+    elif data == "confirm_order":
+        await confirm_order(update, context)
+    elif data == "my_orders":
+        await show_my_orders(update, context)
+    elif data == "contact":
+        await show_contact(update, context)
+
+def main():
+    app = Application.builder().token(TOKEN).build()
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(CallbackQueryHandler(button_handler))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+    print("✅ البوت شغال!")
+    app.run_polling()
+
+if __name__ == "__main__":
+    main()
