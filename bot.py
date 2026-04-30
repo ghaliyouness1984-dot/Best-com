@@ -1,12 +1,12 @@
 import logging
+import os
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, MessageHandler, filters, ContextTypes
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-TOKEN = "8618381817:AAHvt4BAUONCzuFmSQiVjDvJHCg92RZW1cI"
-ADMIN_ID = None
+TOKEN = "8645381951:AAFZGpAULRs1NlJ5BjmGuIsnA3IBXygoqD0"
 WHATSAPP = "0664530175"
 
 PRODUCTS = [
@@ -43,7 +43,7 @@ async def show_main_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     markup = InlineKeyboardMarkup(keyboard)
     text = (
         "🌟 *أهلاً بك في Best-Ecom* 🌟\n"
-        "أفضل متجر للعبايات المغربية الفاخرة\n\n"
+        "أفضل متجر للتجارة الإلكترونية\n\n"
         "اختر ما تريد من القائمة أدناه 👇"
     )
     if update.callback_query:
@@ -143,16 +143,10 @@ async def clear_cart(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def confirm_order(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
-    user_id = query.from_user.id
-    cart = get_cart(user_id)
-    if not cart:
-        await query.edit_message_text("❌ السلة فارغة!")
-        return
     context.user_data["awaiting_address"] = True
     keyboard = [[InlineKeyboardButton("❌ إلغاء", callback_data="cart")]]
     await query.edit_message_text(
-        "📍 *أدخل عنوانك للتوصيل:*\n\n"
-        "مثال: الدار البيضاء، حي المحمدي، شارع...",
+        "📍 *أدخل عنوانك للتوصيل:*\n\nمثال: الدار البيضاء، حي المحمدي، شارع...",
         reply_markup=InlineKeyboardMarkup(keyboard),
         parse_mode="Markdown"
     )
